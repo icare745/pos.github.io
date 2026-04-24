@@ -6,7 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PawPOS">
-<title>PawPOS 寵物店管理系統</title>
+<title>PawPOS 寵物店管理系統 Pro</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -34,131 +36,56 @@ body{display:flex;flex-direction:column}
 .bn-item .bni{font-size:20px;line-height:1}
 .bn-item.active{color:var(--acc2)}
 .bn-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.more-menu{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;justify-content:flex-end}
-.more-bg{position:absolute;inset:0;background:rgba(0,0,0,0.6)}
-.more-sheet{position:relative;background:var(--bg2);border-radius:20px 20px 0 0;padding:16px 16px calc(var(--safe-bottom)+16px);border-top:1px solid var(--border)}
-.more-sheet h3{font-size:13px;color:var(--text3);margin-bottom:12px;font-weight:500;text-transform:uppercase;letter-spacing:1px}
-.more-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.more-btn{background:var(--bg3);border-radius:12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;border:1px solid var(--border)}
-.more-btn.active{border-color:var(--acc);background:var(--acc3)22}
-.more-btn .mbi{font-size:22px}
-.more-btn span{font-size:11px;color:var(--text2);text-align:center;line-height:1.2}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
 .card-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-label{font-size:12px;color:var(--text2);margin-bottom:4px;display:block}
-input,select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--text);font-size:14px;outline:none;-webkit-appearance:none;appearance:none;font-family:inherit}
-input:focus,select:focus,textarea:focus{border-color:var(--acc);background:var(--bg4)}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239390bf' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
-select option{background:var(--bg3)}
-.form-row{margin-bottom:10px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.btn{padding:12px 18px;border-radius:12px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.15s;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;-webkit-appearance:none}
+input,select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--text);font-size:14px;outline:none}
+.btn{padding:12px 18px;border-radius:12px;border:none;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-primary{background:var(--acc);color:#fff}
-.btn-primary:active{background:var(--acc3)}
 .btn-success{background:#1a4d2e;color:var(--green)}
 .btn-danger{background:#4d1a1a;color:var(--red)}
-.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}
-.btn-sm{padding:8px 14px;font-size:13px;border-radius:10px}
 .btn-full{width:100%}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
-td{padding:10px 10px;border-bottom:1px solid var(--border)22;color:var(--text2)}
-tr:active td{background:var(--bg3)}
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
-.badge-green{background:#14532d;color:var(--green)}
-.badge-red{background:#7f1d1d;color:var(--red)}
-.badge-amber{background:#78350f;color:var(--amber)}
-.badge-blue{background:#1e3a5f;color:var(--blue)}
-.badge-purple{background:var(--acc3);color:var(--acc2)}
-::-webkit-scrollbar{display:none}
-.notice-box{background:#78350f22;border:1px solid #ffb83055;border-radius:10px;padding:10px 12px;font-size:12px;color:var(--amber);margin-top:8px}
-.warn-box{background:#7f1d1d22;border:1px solid #ff6b6b44;border-radius:10px;padding:10px 12px;font-size:12px;color:var(--red);margin-top:8px}
-.ok-box{background:#14532d22;border:1px solid #3ddc8444;border-radius:10px;padding:10px 12px;font-size:12px;color:var(--green);margin-top:8px}
-.hidden{display:none!important}
 .prod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:260px;overflow-y:auto}
-.prod-btn{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 6px;cursor:pointer;text-align:center;transition:all 0.15s;color:var(--text)}
-.prod-btn:active{border-color:var(--acc);background:var(--bg4);transform:scale(0.97)}
-.prod-btn .pimg-ph{width:44px;height:44px;border-radius:8px;background:var(--bg4);margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.prod-btn{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center;color:var(--text)}
 .cart-item{display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg3);border-radius:10px;margin-bottom:6px}
-.ci-name{flex:1;font-size:13px;color:var(--text)}
-.ci-qty-ctrl{display:flex;align-items:center;gap:6px}
-.qty-btn{width:28px;height:28px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ci-price{font-size:13px;color:var(--acc2);font-weight:600;min-width:60px;text-align:right}
-.total-block{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:10px}
-.total-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:var(--text2)}
-.total-big{font-size:22px;font-weight:700;color:var(--acc2)}
-.pay-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-.pay-scroll::-webkit-scrollbar{display:none}
-.pay-chip{flex-shrink:0;padding:9px 16px;border-radius:30px;border:2px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;transition:all 0.15s;white-space:nowrap;font-family:inherit}
-.pay-chip.sel{border-color:var(--acc);background:var(--acc3);color:#fff}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;flex-direction:column;justify-content:flex-end;z-index:400}
-.modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:20px 16px calc(var(--safe-bottom)+16px);max-height:90vh;overflow-y:auto;border-top:1px solid var(--border)}
-.modal-title{font-size:16px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);color:var(--text)}
-.modal-drag{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px}
-.calendar{width:100%;border-collapse:collapse}
-.calendar th{padding:10px 4px;font-size:11px;text-align:center;background:var(--bg3)}
-.calendar td{padding:8px 4px;text-align:center;font-size:12px;border:1px solid var(--border);position:relative;min-height:60px;vertical-align:top}
-.calendar .other-month{color:var(--text3);background:var(--bg3)22}
-.cal-day{font-weight:600;color:var(--text);display:block;margin-bottom:4px}
-.cal-event{font-size:10px;background:var(--acc3);color:var(--acc2);border-radius:4px;padding:2px 4px;margin:2px 0;word-break:break-word}
-.cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.cal-nav button{padding:8px 14px;font-size:13px}
-.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:flex-end;justify-content:center;padding-bottom:var(--safe-bottom)}
+#scanner{width:100%;height:180px;background:#000;border-radius:12px;overflow:hidden;margin-bottom:12px;display:none}
+#scanner video{width:100%;height:100%;object-fit:cover}
+.hidden{display:none!important}
+.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:flex-end;justify-content:center;padding-bottom:var(--safe-bottom);z-index:1000}
 .login-sheet{background:var(--bg2);border-radius:24px 24px 0 0;padding:28px 24px 32px;width:100%;border-top:1px solid var(--border)}
-.login-logo{text-align:center;margin-bottom:24px}
 .u-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.u-card{background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:14px 8px;cursor:pointer;text-align:center;transition:all 0.15s}
+.u-card{background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
 .u-card.sel{border-color:var(--acc)}
-.u-av{width:44px;height:44px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
-.u-name{font-size:12px;font-weight:600;color:var(--text)}
-.u-role{font-size:10px;color:var(--text3);margin-top:2px}
-.stat-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
-.stat-val{font-size:20px;font-weight:700;color:var(--acc2);margin-bottom:3px}
-.stat-label{font-size:11px;color:var(--text3)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text3)}
+td{padding:10px 10px;border-bottom:1px solid var(--border)22;color:var(--text2)}
 </style>
 </head>
 <body>
 
 <div class="login-screen" id="loginScreen">
   <div class="login-sheet">
-    <div class="login-logo">
-      <div style="font-size:48px;margin-bottom:8px">🐾</div>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:48px">🐾</div>
       <div style="font-size:22px;font-weight:700;color:var(--acc2)">PawPOS</div>
-      <div style="font-size:13px;color:var(--text3);margin-top:3px">寵物店管理系統</div>
     </div>
     <div class="u-cards" id="uCards"></div>
-    <div class="form-row">
-      <label>密碼</label>
-      <input type="password" id="loginPwd" placeholder="輸入密碼..." style="font-size:16px" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <button class="btn btn-primary btn-full" style="margin-top:10px;padding:14px" onclick="doLogin()">登入</button>
-    <p id="loginErr" style="color:var(--red);font-size:12px;text-align:center;margin-top:8px;display:none">密碼錯誤，請重試</p>
+    <input type="password" id="loginPwd" placeholder="輸入密碼..." style="margin-bottom:10px">
+    <button class="btn btn-primary btn-full" onclick="doLogin()">登入</button>
   </div>
 </div>
 
 <div class="app-shell hidden" id="mainApp">
   <div class="topbar">
-    <div class="tb-left">
-      <span style="font-size:20px">🐾</span>
-      <div class="page-title" id="pageTitle">交易</div>
-    </div>
-    <div class="tb-right">
-      <div style="font-size:12px;color:var(--text3)" id="topDate"></div>
-      <div class="avatar" id="topAvatar">A</div>
-      <div style="font-size:12px;color:var(--text2)" id="topUser"></div>
-    </div>
+    <div class="tb-left"><span style="font-size:20px">🐾</span><div class="page-title" id="pageTitle">交易</div></div>
+    <div class="tb-right"><div class="avatar" id="topAvatar">A</div><div style="font-size:12px" id="topUser"></div></div>
   </div>
   <div class="content" id="mainContent"></div>
   <div class="bottom-nav" id="bottomNav"></div>
 </div>
 
-<div id="modalContainer"></div>
-
 <script>
-const D={
+// --- 資料結構 (初始化) ---
+let D = JSON.parse(localStorage.getItem('PawPOS_Data')) || {
   users:[
     {id:1,name:'陳店長',role:'管理員',pwd:'1234',color:'#6c63ff'},
     {id:2,name:'李美容師',role:'美容師',pwd:'2222',color:'#29d9c2'},
@@ -167,350 +94,49 @@ const D={
   payMethods:['現金','PayMe','轉數快','套票'],
   categories:['食品','零食','護理','清潔','服務'],
   products:[
-    {id:'P001',name:'狗糧 Hill\'s 7kg',cat:'食品',price:280,cost:180,stock:45,supplier:'Hill\'s HK',img:''},
-    {id:'P002',name:'貓糧 Royal Canin',cat:'食品',price:320,cost:200,stock:30,supplier:'Royal Canin',img:''},
-    {id:'P003',name:'除蚤頸圈',cat:'護理',price:95,cost:40,stock:60,supplier:'Seresto',img:''},
-    {id:'P004',name:'磨牙骨 10條',cat:'零食',price:65,cost:30,stock:80,supplier:'本地',img:''},
-    {id:'P005',name:'狗廁所墊 50片',cat:'清潔',price:120,cost:60,stock:25,supplier:'本地',img:''},
-    {id:'P006',name:'貓砂 7L',cat:'清潔',price:88,cost:45,stock:40,supplier:'Ever Clean',img:''},
-    {id:'SRV001',name:'沖涼服務',cat:'服務',price:180,cost:50,stock:999,supplier:'內部',img:''},
-    {id:'SRV002',name:'全剷服務',cat:'服務',price:380,cost:100,stock:999,supplier:'內部',img:''},
-    {id:'SRV003',name:'開裝服務',cat:'服務',price:280,cost:80,stock:999,supplier:'內部',img:''},
-    {id:'SRV004',name:'住宿 每晚',cat:'服務',price:250,cost:60,stock:999,supplier:'內部',img:''},
-    {id:'SRV005',name:'日托服務',cat:'服務',price:150,cost:40,stock:999,supplier:'內部',img:''},
-    {id:'SRV006',name:'上門服務',cat:'服務',price:450,cost:120,stock:999,supplier:'內部',img:''},
+    {id:'P001',name:'狗糧 Hill\'s 7kg',cat:'食品',price:280,stock:45,code:''},
+    {id:'P002',name:'貓糧 Royal Canin',cat:'食品',price:320,stock:30,code:''},
+    {id:'SRV001',name:'沖涼服務',cat:'服務',price:180,stock:999,code:''}
   ],
   customers:[
-    {id:'C001',name:'張小明',phone:'91234567',notice:'對花生過敏',ticket:null,pets:[{name:'豆豆',species:'柴犬',weight:8.5,notice:'怕水'}]},
-    {id:'C002',name:'李美華',phone:'98765432',notice:'',ticket:{no:'TK002',balance:850},pets:[{name:'咪咪',species:'英短貓',weight:4.2,notice:''},{name:'橘子',species:'虎斑貓',weight:5.1,notice:'咬人'}]},
-    {id:'C003',name:'王大文',phone:'95551234',notice:'優先客人',ticket:null,pets:[{name:'大黑',species:'拉布拉多',weight:28,notice:'怕雷聲'}]},
+    {id:'C001',name:'張小明',phone:'91234567',ticket:{balance:500}}
   ],
-  transactions:[
-    {id:'T001',date:'2025-01-20',customer:'張小明',phone:'91234567',items:[{id:'P001',name:'狗糧 Hill\'s 7kg',qty:1,price:280}],payment:'現金',total:280,change:20,discount:0,staff:'陳店長',note:''},
-    {id:'T002',date:'2025-01-21',customer:'李美華',phone:'98765432',items:[{id:'SRV001',name:'沖涼服務',qty:1,price:180},{id:'P004',name:'磨牙骨 10條',qty:2,price:65}],payment:'套票',total:310,change:0,discount:0,staff:'李美容師',note:''},
-  ],
-  appointments:[
-    {id:'A001',date:'2025-02-05',time:'10:00',customer:'張小明',phone:'91234567',pet:'豆豆',service:'沖涼服務',status:'已確認',notice:''},
-    {id:'A002',date:'2025-02-10',time:'14:00',customer:'李美華',phone:'98765432',pet:'咪咪',service:'全剷服務',status:'待確認',notice:'輕剪'},
-    {id:'A003',date:'2025-02-15',time:'11:00',customer:'王大文',phone:'95551234',pet:'大黑',service:'住宿(每晚)',status:'已確認',notice:''},
-  ],
-  expenses:[],
-  orders:[],
+  transactions:[],
+  appointments:[],
   cart:[],
   selPay:'現金',
-  currentUser:null,
+  currentUser:null
 };
 
-let selUid=null,currentPage='pos';
+function save() { localStorage.setItem('PawPOS_Data', JSON.stringify(D)); }
 
-(function(){
-  const uc=document.getElementById('uCards');
-  D.users.forEach(u=>{
-    uc.innerHTML+=`<div class="u-card" id="ub${u.id}" onclick="selUser(${u.id})">
-      <div class="u-av" style="background:${u.color}22;color:${u.color}">${u.name[0]}</div>
-      <div class="u-name">${u.name}</div><div class="u-role">${u.role}</div></div>`;
+// --- 登入邏輯 ---
+let selUid = null;
+(function initLogin(){
+  const uc = document.getElementById('uCards');
+  D.users.forEach(u => {
+    uc.innerHTML += `<div class="u-card" id="ub${u.id}" onclick="selUser(${u.id})">
+      <div style="color:${u.color};font-size:18px;font-weight:700">${u.name[0]}</div>
+      <div style="font-size:12px">${u.name}</div></div>`;
   });
 })();
 
-function selUser(id){selUid=id;document.querySelectorAll('.u-card').forEach(e=>e.classList.remove('sel'));document.getElementById('ub'+id).classList.add('sel');}
+function selUser(id){
+  selUid=id; 
+  document.querySelectorAll('.u-card').forEach(e=>e.classList.remove('sel'));
+  document.getElementById('ub'+id).classList.add('sel');
+}
+
 function doLogin(){
-  if(!selUid)return;
-  const u=D.users.find(x=>x.id===selUid);
-  if(document.getElementById('loginPwd').value!==u.pwd){document.getElementById('loginErr').style.display='block';return;}
-  D.currentUser=u;
+  if(!selUid) return;
+  const u = D.users.find(x=>x.id===selUid);
+  if(document.getElementById('loginPwd').value !== u.pwd) return alert("密碼錯誤");
+  D.currentUser = u;
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('mainApp').classList.remove('hidden');
-  document.getElementById('topUser').textContent=u.name;
-  document.getElementById('topAvatar').textContent=u.name[0];
-  document.getElementById('topDate').textContent=new Date().toLocaleDateString('zh-HK',{month:'short',day:'numeric'});
-  buildBottomNav();nav('pos');
-}
-function logout(){document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('mainApp').classList.add('hidden');document.getElementById('loginPwd').value='';selUid=null;document.querySelectorAll('.u-card').forEach(e=>e.classList.remove('sel'));document.getElementById('loginErr').style.display='none';}
-
-const MAIN_TABS=[
-  {id:'pos',icon:'🛒',label:'交易'},
-  {id:'history',icon:'📝',label:'紀錄'},
-  {id:'appointments',icon:'📅',label:'預約'},
-  {id:'inventory',icon:'📦',label:'貨存'},
-  {id:'more',icon:'☰',label:'更多'},
-];
-const MORE_ITEMS=[
-  {id:'orders',icon:'📋',label:'訂貨'},
-  {id:'restock',icon:'🚚',label:'入貨'},
-  {id:'customers',icon:'👥',label:'客人'},
-  {id:'tickets',icon:'🎟',label:'套票'},
-  {id:'expenses',icon:'💸',label:'支出'},
-  {id:'stats',icon:'📊',label:'統計'},
-  {id:'settings',icon:'⚙️',label:'設定'},
-  {id:'logout_btn',icon:'🔒',label:'登出'},
-];
-
-function buildBottomNav(){
-  const nav=document.getElementById('bottomNav');
-  nav.innerHTML=MAIN_TABS.map(t=>`<div class="bn-item${t.id==='pos'?' active':''}" id="bn-${t.id}" onclick="bnClick('${t.id}')"><div class="bni">${t.icon}</div><span>${t.label}</span></div>`).join('');
-}
-function bnClick(id){
-  if(id==='more'){showMoreMenu();return;}
-  MAIN_TABS.forEach(t=>{const el=document.getElementById('bn-'+t.id);if(el)el.classList.toggle('active',t.id===id);});
-  nav(id);
-}
-function showMoreMenu(){
-  const mc=document.getElementById('modalContainer');
-  mc.innerHTML=`<div class="more-menu" id="moreMenu">
-    <div class="more-bg" onclick="closeMore()"></div>
-    <div class="more-sheet">
-      <div class="modal-drag"></div>
-      <h3>更多功能</h3>
-      <div class="more-grid">
-        ${MORE_ITEMS.map(m=>`<div class="more-btn" onclick="${m.id==='logout_btn'?'closeMore();logout()':'closeMore();bnClick(\''+m.id+'\')'}"}>
-          <div class="mbi">${m.icon}</div><span>${m.label}</span></div>`).join('')}
-      </div>
-    </div></div>`;
-}
-function closeMore(){document.getElementById('modalContainer').innerHTML='';}
-
-const PAGE_TITLES={pos:'交易',history:'交易紀錄',appointments:'預約月曆',inventory:'貨存',orders:'訂貨',restock:'入貨資料',customers:'客人資料',tickets:'套票紀錄',expenses:'支出',stats:'每月統計',settings:'系統設定'};
-function nav(page){
-  currentPage=page;
-  document.getElementById('pageTitle').textContent=PAGE_TITLES[page]||page;
-  const c=document.getElementById('mainContent');c.innerHTML='';
-  const fn={pos:renderPOS,history:renderHistory,appointments:renderAppointments,inventory:renderInventory,orders:renderOrders,restock:renderRestock,customers:renderCustomers,tickets:renderTickets,expenses:renderExpenses,stats:renderStats,settings:renderSettings};
-  if(fn[page])fn[page](c);
+  document.getElementById('topUser').textContent = u.name;
+  document.getElementById('topAvatar').textContent = u.name[0];
+  buildBottomNav(); nav('pos');
 }
 
-function todayStr(){return new Date().toISOString().slice(0,10)}
-
-function renderPOS(c){
-  D.cart=[];D.selPay=D.payMethods[0]||'現金';
-  c.innerHTML=`
-  <div class="card">
-    <div class="card-title">客人 & 經手人</div>
-    <div class="g2"><div class="form-row"><label>客人電話</label>
-      <input id="posPhone" placeholder="電話號碼..." oninput="posAutoFill()" style="flex:1;font-size:16px"></div>
-      <div class="form-row"><label>客人姓名</label><input id="posName" placeholder="自動填寫..."></div>
-    </div>
-    <div class="g2"><div class="form-row"><label>日期</label><input id="posDate" type="date" value="${todayStr()}"></div>
-      <div class="form-row"><label>經手人</label><select id="posStaff">${D.users.map(u=>`<option${u.id===D.currentUser.id?' selected':''}>${u.name}</option>`).join('')}</select></div>
-    </div>
-    <div class="form-row"><label>備注</label><input id="posNote"></div>
-    <div id="posNotice"></div><div id="posTkInfo"></div>
-    
-    <div style="margin-top:10px;padding:10px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">
-      <label>增值套票</label>
-      <div style="display:flex;gap:8px;margin-top:6px">
-        <input id="posAddTkAmt" type="number" placeholder="增值金額..." inputmode="numeric" style="flex:1">
-        <button class="btn btn-primary btn-sm" onclick="addTicketAtPOS()">💳 增值</button>
-      </div>
-      <div id="posAddTkResult"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">選擇產品</div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <input id="posSearch" placeholder="🔍 搜尋..." oninput="renderProdBtns()" style="flex:1">
-      <select id="posCat" onchange="renderProdBtns()" style="width:80px;font-size:12px">
-        <option value="">全部</option>${D.categories.map(cat=>`<option>${cat}</option>`).join('')}
-      </select>
-    </div>
-    <div class="prod-grid" id="productList"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">購物車</div>
-    <div id="cartItems"><p style="color:var(--text3);font-size:13px;text-align:center;padding:14px 0">尚未加入商品</p></div>
-    <div class="total-block">
-      <div class="form-row" style="margin-bottom:8px"><label>折扣 (%)</label><input id="posDisc" type="number" min="0" max="100" value="0" oninput="updateTotal()" inputmode="numeric"></div>
-      <div class="total-row"><span>小計</span><span id="posSub">HK$0</span></div>
-      <div class="total-row"><span>折扣</span><span id="posDA" style="color:var(--red)">-HK$0</span></div>
-      <div class="total-row" style="padding-top:8px;border-top:1px solid var(--border);margin-top:4px">
-        <span class="total-big">應付</span><span class="total-big" id="posTotal">HK$0</span></div>
-      <div class="form-row" style="margin-top:10px"><label>收款 (HK$)</label><input id="posCash" type="number" placeholder="0" oninput="updateChange()" inputmode="numeric"></div>
-      <div class="total-row"><span>找錢</span><span id="posChange" style="color:var(--green);font-weight:600">HK$0</span></div>
-      <div style="margin-top:10px"><label>付款方式</label>
-        <div class="pay-scroll" id="payChips"></div>
-      </div>
-      <div id="tkWarn"></div>
-    </div>
-    <div class="btn-row" style="margin-top:12px">
-      <button class="btn btn-success" style="flex:1" onclick="completeSale()">✅ 完成交易</button>
-    </div>
-    <div id="saleResult"></div>
-  </div>`;
-  renderPayChips();renderProdBtns();
-}
-
-function addTicketAtPOS(){
-  const ph=(document.getElementById('posPhone')||{}).value||'';
-  const amt=parseInt((document.getElementById('posAddTkAmt')||{}).value)||0;
-  if(!ph||!amt){alert('請輸入電話及金額');return;}
-  const cu=D.customers.find(c=>c.phone===ph);
-  if(!cu){alert('找不到客人');return;}
-  if(!cu.ticket){cu.ticket={no:'TK'+String(Date.now()).slice(-4),balance:0};}
-  cu.ticket.balance+=amt;
-  const r=document.getElementById('posAddTkResult');
-  if(r)r.innerHTML=`<div class="ok-box" style="margin-top:8px">✅ 增值成功！${cu.name} 新餘額: HK$${cu.ticket.balance}</div>`;
-  document.getElementById('posAddTkAmt').value='';
-  posAutoFill();
-}
-
-function renderPayChips(){
-  const pc=document.getElementById('payChips');if(!pc)return;
-  pc.innerHTML=D.payMethods.map(m=>`<button class="pay-chip${D.selPay===m?' sel':''}" onclick="selPay('${m}')">${m}</button>`).join('');
-}
-function selPay(m){D.selPay=m;renderPayChips();}
-function renderProdBtns(){
-  const q=(document.getElementById('posSearch')||{}).value||'';
-  const cat=(document.getElementById('posCat')||{}).value||'';
-  const pl=document.getElementById('productList');if(!pl)return;
-  const f=D.products.filter(p=>(!q||(p.name+p.id).toLowerCase().includes(q.toLowerCase()))&&(!cat||p.cat===cat)&&p.stock>0);
-  pl.innerHTML=f.map(p=>`<div class="prod-btn" onclick="addToCart('${p.id}')"><div class="pimg-ph">${p.cat==='服務'?'✂️':'📦'}</div><div class="pname">${p.name}</div><div class="pprice">$${p.price}</div></div>`).join('');
-}
-function addToCart(id){
-  const p=D.products.find(x=>x.id===id);if(!p)return;
-  const ex=D.cart.find(x=>x.id===id);
-  if(ex)ex.qty++;else D.cart.push({id,name:p.name,price:p.price,qty:1});
-  renderCart();
-}
-function updQty(id,d){
-  const i=D.cart.findIndex(x=>x.id===id);if(i<0)return;
-  D.cart[i].qty+=d;if(D.cart[i].qty<=0)D.cart.splice(i,1);renderCart();
-}
-function renderCart(){
-  const ci=document.getElementById('cartItems');if(!ci)return;
-  if(!D.cart.length){ci.innerHTML='<p style="color:var(--text3);font-size:13px;text-align:center;padding:14px 0">尚未加入商品</p>';updateTotal();return;}
-  ci.innerHTML=D.cart.map(i=>`<div class="cart-item">
-    <div class="ci-name">${i.name}</div>
-    <div class="ci-qty-ctrl">
-      <button class="qty-btn" onclick="updQty('${i.id}',-1)">−</button>
-      <span style="font-size:14px;min-width:20px;text-align:center;color:var(--text)">${i.qty}</span>
-      <button class="qty-btn" onclick="updQty('${i.id}',1)">+</button>
-    </div>
-    <div class="ci-price">$${i.price*i.qty}</div></div>`).join('');
-  updateTotal();
-}
-function updateTotal(){
-  const sub=D.cart.reduce((s,i)=>s+i.price*i.qty,0);
-  const d=parseInt((document.getElementById('posDisc')||{}).value)||0;
-  const da=Math.round(sub*d/100);const total=sub-da;
-  if(document.getElementById('posSub'))document.getElementById('posSub').textContent='HK$'+sub;
-  if(document.getElementById('posDA'))document.getElementById('posDA').textContent='-HK$'+da;
-  if(document.getElementById('posTotal'))document.getElementById('posTotal').textContent='HK$'+total;
-  updateChange();
-}
-function updateChange(){
-  const te=document.getElementById('posTotal'),ce=document.getElementById('posCash'),ch=document.getElementById('posChange');if(!te||!ch)return;
-  const total=parseInt(te.textContent.replace('HK$',''))||0;const cash=parseInt((ce||{}).value)||0;
-  const r=cash-total;ch.textContent='HK$'+(r>0?r:0);
-}
-function posAutoFill(){
-  const ph=(document.getElementById('posPhone')||{}).value||'';
-  const cu=D.customers.find(c=>c.phone===ph);
-  if(cu){
-    if(document.getElementById('posName'))document.getElementById('posName').value=cu.name;
-    if(document.getElementById('posTkInfo')&&cu.ticket)document.getElementById('posTkInfo').innerHTML=`<div style="font-size:12px;color:var(--text2);margin-top:6px">🎟 套票: <b>HK$${cu.ticket.balance}</b></div>`;
-  }
-}
-function completeSale(){
-  if(!D.cart.length){alert('購物車是空的');return;}
-  const name=(document.getElementById('posName')||{}).value||'訪客';
-  const phone=(document.getElementById('posPhone')||{}).value||'';
-  const total=parseInt((document.getElementById('posTotal')||{}).textContent.replace('HK$',''))||0;
-  const staff=(document.getElementById('posStaff')||{}).value||D.currentUser.name;
-  if(D.selPay==='套票'){
-    const cu=D.customers.find(c=>c.phone===phone);
-    if(!cu||!cu.ticket){alert('此客人沒有套票');return;}
-    if(cu.ticket.balance<total){alert(`套票不足！餘額 HK$${cu.ticket.balance}`);return;}
-    cu.ticket.balance-=total;
-  }
-  D.transactions.unshift({id:'T'+String(D.transactions.length+1).padStart(3,'0'),date:todayStr(),customer:name,phone,items:D.cart.map(i=>({id:i.id,name:i.name,qty:i.qty,price:i.price})),payment:D.selPay,total,discount:0,staff,note:''});
-  D.cart.forEach(ci=>{const p=D.products.find(x=>x.id===ci.id);if(p&&p.stock<999)p.stock-=ci.qty;});
-  const sr=document.getElementById('saleResult');
-  if(sr)sr.innerHTML=`<div class="ok-box">✅ 交易完成！HK$${total}</div>`;
-  D.cart=[];renderCart();
-}
-
-function renderHistory(c){
-  c.innerHTML=`<div class="card"><div style="overflow-x:auto"><table>
-    <thead><tr><th>單號</th><th>客人</th><th>付款</th><th>經手</th><th>金額</th></tr></thead>
-    <tbody>${D.transactions.map(t=>`<tr><td>${t.id}</td><td>${t.customer}</td><td>${t.payment}</td><td>${t.staff||'—'}</td><td style="color:var(--green);font-weight:600">$${t.total}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:16px">沒有紀錄</td></tr>'}</tbody>
-    </table></div>
-  </div>`;
-}
-
-function renderAppointments(c){
-  let curDate=new Date(new Date().getFullYear(),new Date().getMonth(),1);
-  c.innerHTML=`<div class="card">
-    <div class="cal-nav">
-      <button class="btn btn-outline btn-sm" onclick="prevMonth()">◀ 上月</button>
-      <div style="font-size:14px;font-weight:600;color:var(--text)" id="curMonth"></div>
-      <button class="btn btn-outline btn-sm" onclick="nextMonth()">下月 ▶</button>
-    </div>
-    <table class="calendar"><thead><tr><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr></thead>
-    <tbody id="calBody"></tbody></table>
-  </div>
-  <div class="card">
-    <div class="card-title">新增預約</div>
-    <div class="g2"><div class="form-row"><label>日期</label><input id="apDt" type="date" value="${todayStr()}"></div><div class="form-row"><label>時間</label><input id="apTm" type="time" value="10:00"></div></div>
-    <div class="g2"><div class="form-row"><label>客人電話</label><input id="apPh"></div><div class="form-row"><label>客人姓名</label><input id="apNm"></div></div>
-    <div class="g2"><div class="form-row"><label>寵物</label><input id="apPet"></div><div class="form-row"><label>服務</label><select id="apSvc"><option>沖涼</option><option>全剷</option><option>開裝</option></select></div></div>
-    <button class="btn btn-primary btn-full" onclick="addAppt()">✅ 確認預約</button>
-  </div>`;
-  window.curMonthDate=curDate;
-  renderCal();
-}
-window.curMonthDate=new Date();
-function prevMonth(){window.curMonthDate=new Date(window.curMonthDate.getFullYear(),window.curMonthDate.getMonth()-1,1);renderCal();}
-function nextMonth(){window.curMonthDate=new Date(window.curMonthDate.getFullYear(),window.curMonthDate.getMonth()+1,1);renderCal();}
-function renderCal(){
-  const d=window.curMonthDate;
-  const mStr=d.toLocaleDateString('zh-HK',{year:'numeric',month:'long'});
-  const first=new Date(d.getFullYear(),d.getMonth(),1);
-  const last=new Date(d.getFullYear(),d.getMonth()+1,0);
-  const startDate=new Date(first);startDate.setDate(startDate.getDate()-first.getDay());
-  const endDate=new Date(last);endDate.setDate(endDate.getDate()+(6-last.getDay()));
-  
-  const rows=[];let week=[];
-  for(let dt=new Date(startDate);dt<=endDate;dt.setDate(dt.getDate()+1)){
-    const dateStr=dt.toISOString().slice(0,10);
-    const isOther=dt.getMonth()!==d.getMonth();
-    const appts=D.appointments.filter(a=>a.date===dateStr);
-    const dayEvts=appts.map(a=>`<div class="cal-event">${a.customer.slice(0,2)}:${a.service.slice(0,3)}</div>`).join('');
-    week.push(`<td class="${isOther?'other-month':''}"><span class="cal-day">${dt.getDate()}</span>${dayEvts}</td>`);
-    if(week.length===7){rows.push(`<tr>${week.join('')}</tr>`);week=[];}
-  }
-  document.getElementById('curMonth').textContent=mStr;
-  document.getElementById('calBody').innerHTML=rows.join('');
-}
-function addAppt(){
-  const date=document.getElementById('apDt').value;
-  const time=document.getElementById('apTm').value;
-  const phone=document.getElementById('apPh').value;
-  const name=document.getElementById('apNm').value;
-  const pet=document.getElementById('apPet').value;
-  const service=document.getElementById('apSvc').value;
-  D.appointments.unshift({id:'A'+String(D.appointments.length+1).padStart(3,'0'),date,time,customer:name||'未知',phone,pet,service,status:'待確認',notice:''});
-  renderCal();
-}
-
-function renderInventory(c){c.innerHTML=`<div class="card"><div style="overflow-x:auto"><table><thead><tr><th>產品</th><th>庫存</th><th>售價</th></tr></thead><tbody>${D.products.map(p=>`<tr><td>${p.name}</td><td style="color:var(--green)">${p.stock}</td><td>$${p.price}</td></tr>`).join('')}</tbody></table></div></div>`;}
-
-function renderOrders(c){c.innerHTML=`<div class="card"><div class="card-title">訂貨功能（待開發）</div><p style="color:var(--text3)">訂貨管理功能</p></div>`;}
-
-function renderRestock(c){c.innerHTML=`<div class="card"><div class="card-title">入貨功能（待開發）</div><p style="color:var(--text3)">入貨管理功能</p></div>`;}
-
-function renderCustomers(c){c.innerHTML=`<div class="card"><div style="overflow-x:auto"><table><thead><tr><th>客人</th><th>電話</th><th>套票</th></tr></thead><tbody>${D.customers.map(cu=>`<tr><td>${cu.name}</td><td>${cu.phone}</td><td>${cu.ticket?'HK$'+cu.ticket.balance:'無'}</td></tr>`).join('')}</tbody></table></div></div>`;}
-
-function renderTickets(c){c.innerHTML=`<div class="card"><div class="card-title">套票管理</div><p style="color:var(--text3)">套票功能（已在交易頁整合）</p></div>`;}
-
-function renderExpenses(c){c.innerHTML=`<div class="card"><div class="card-title">支出（待開發）</div><p style="color:var(--text3)">支出管理功能</p></div>`;}
-
-function renderStats(c){c.innerHTML=`<div class="card"><div class="card-title">統計（待開發）</div><p style="color:var(--text3)">統計報表功能</p></div>`;}
-
-function renderSettings(c){c.innerHTML=`<div class="card"><div class="card-title">系統設定</div><p style="color:var(--text3)">設定功能（待開發）</p></div>`;}
-
-function showModal(html){const mc=document.getElementById('modalContainer');mc.innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal">${html}</div></div>`;}
-function closeModal(){document.getElementById('modalContainer').innerHTML='';}
-</script>
-</body>
-</html>
+// --- 導航 ---
