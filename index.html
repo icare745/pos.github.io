@@ -140,3 +140,150 @@ function doLogin(){
 }
 
 // --- 導航 ---
+const MAIN_TABS = [
+  {id:'pos',icon:'🛒',label:'交易'},
+  {id:'history',icon:'📝',label:'紀錄'},
+  {id:'inventory',icon:'📦',label:'貨存'},
+  {id:'logout',icon:'🔒',label:'登出'}
+];
+
+function buildBottomNav(){
+  const nav = document.getElementById('bottomNav');
+  nav.innerHTML = MAIN_TABS.map(t => `<div class="bn-item" id="bn-${t.id}" onclick="bnClick('${t.id}')"><div class="bni">${t.icon}</div><span>${t.label}</span></div>`).join('');
+}
+
+function bnClick(id){
+  if(id==='logout') return location.reload();
+  document.querySelectorAll('.bn-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('bn-'+id).classList.add('active');
+  nav(id);
+}
+
+function nav(page){
+  const c = document.getElementById('mainContent'); 
+  document.getElementById('pageTitle').textContent = page === 'pos'?'交易':page==='history'?'紀錄':'貨存';
+  c.innerHTML = '';
+  if(page==='pos') renderPOS(c);
+  if(page==='history') renderHistory(c);
+  if(page==='inventory') renderInventory(c);
+}
+
+// --- 交易頁面 (含掃描) ---
+function renderPOS(c){
+  D.cart = [];
+  c.innerHTML = `
+    <div class="card">
+      <div id="scanner"></div>
+      <button class="btn btn-primary btn-full" onclick="toggleScanner()" style="margin-bottom:10px">📷 掃描條碼</button>
+      <input id="posSearch" placeholder="搜尋名稱或條碼..." oninput="renderProdBtns()">
+      <div class="prod-grid" id="productList" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">購物車</div>
+      <div id="cartItems"></div>
+      <div style="margin-top:10px; font-size:20px; font-weight:700; text-align:right" id="posTotal">總計: $0</div>
+      <select id="payBy" style="margin-top:10px">${D.payMethods.map(m=>`<option>${m}</option>`).join('')}</select>
+      <button class="btn btn-success btn-full" style="margin-top:10px" onclick="completeSale()">確認結帳</button>
+    </div>
+  `;
+  renderProdBtns();
+}
+
+function renderProdBtns(){
+  const q = document.getElementById('posSearch').value.toLowerCase();
+  const pl = document.getElementById('productList');
+  pl.innerHTML = D.products.filter(p => p.name.toLowerCase().includes(q) || (p.code && p.code.includes(q)))
+    .map(p => `<div class="prod-btn" onclick="addToCart('${p.id}')"><div>${p.name}</div><div style="color:var(--acc2)">$${p.price}</div></div>`).join('');
+}
+
+function addToCart(id){
+  const p = D.products.find(x=>x.id===id);
+  D.cart.push({...p});
+  const ci = document.getElementById('cartItems');
+  ci.innerHTML = D.cart.map((item,idx)=>`<div class="cart-item"><span>${item.name}</span><span>$${item.price}</span></div>`).join('');
+  document.getElementById('posTotal').textContent = "總計: $" + D.cart.reduce((s,i)=>s+i.price,0);
+}
+
+function completeSale(){
+  if(D.cart.length===0) return;
+  const total = D.cart.reduce((s,i)=>s+i.price,0);
+  D.transactions.unshift({id:'T'+Date.now(), date:new Date().toLocaleString(), total, items:[...D.cart], staff:D.currentUser.name, payment:document.getElementById('payBy').value});
+  D.cart.forEach(item => { let p = D.products.find(x=>x.id===item.id); if(p && p.stock < 900) p.stock--; });
+  save(); alert("交易成功！"); nav('pos');
+}
+
+// --- 紀錄頁面 (含 Excel 匯出) ---
+function renderHistory(c){
+  c.innerHTML = `
+    <button class="btn btn-success btn-full" onclick="exportExcel()" style="margin-bottom:12px">📊 匯出 Excel 報表</button>
+    <div class="card">
+      <table>
+        <thead><tr><th>時間</th><th>金額</th><th>方式</th></tr></thead>
+        <tbody>${D.transactions.map(t=>`<tr><td>${t.date.split(' ')[1]}</td><td style="color:var(--green)">$${t.total}</td><td>${t.payment}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function exportExcel(){
+  const ws1 = XLSX.utils.json_to_sheet(D.products);
+  const ws2 = XLSX.utils.json_to_sheet(D.transactions.map(t=>({日期:t.date,總額:t.total,支付:t.payment,經手:t.staff})));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws1, "貨存清單");
+  XLSX.utils.book_append_sheet(wb, ws2, "銷售紀錄");
+  XLSX.writeFile(wb, "PawPOS_Report.xlsx");
+}
+
+// --- 貨存管理 (含修改功能) ---
+function renderInventory(c){
+  c.innerHTML = `
+    <div class="card">
+      <div class="card-title">產品清單 (點擊📝修改)</div>
+      <table>
+        <thead><tr><th>產品</th><th>售價</th><th>庫存</th><th>操作</th></tr></thead>
+        <tbody>${D.products.map(p=>`<tr>
+          <td>${p.name}</td>
+          <td>$${p.price}</td>
+          <td>${p.stock}</td>
+          <td><button class="btn btn-primary" style="padding:4px 8px" onclick="editProduct('${p.id}')">📝</button></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function editProduct(id){
+  const p = D.products.find(x=>x.id===id);
+  const n = prompt("修改名稱:", p.name); if(!n) return;
+  const pr = prompt("修改售價:", p.price);
+  const st = prompt("修改庫存:", p.stock);
+  const cd = prompt("修改/綁定條碼:", p.code || "");
+  p.name = n; p.price = parseFloat(pr); p.stock = parseInt(st); p.code = cd;
+  save(); renderInventory(document.getElementById('mainContent'));
+}
+
+// --- 掃描邏輯 ---
+let scanning = false;
+function toggleScanner(){
+  const s = document.getElementById('scanner');
+  if(!scanning){
+    s.style.display = 'block';
+    Quagga.init({
+      inputStream: { name: "Live", type: "LiveStream", target: s, constraints: { facingMode: "environment" } },
+      decoder: { readers: ["ean_reader", "code_128_reader"] }
+    }, (err)=>{
+      if(err) return alert("相機啟動失敗");
+      Quagga.start(); scanning = true;
+    });
+    Quagga.onDetected(res => {
+      document.getElementById('posSearch').value = res.codeResult.code;
+      toggleScanner(); renderProdBtns();
+    });
+  } else {
+    Quagga.stop(); s.style.display = 'none'; scanning = false;
+  }
+}
+
+</script>
+</body>
+</html>
